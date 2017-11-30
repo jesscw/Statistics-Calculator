@@ -1,3 +1,5 @@
+;language: R5RS
+
 (define (sum data-set)
   (cond ((null? data-set) 0)
         (else (+ (car data-set) (sum (cdr data-set))))))
@@ -59,13 +61,43 @@
 (define (5-num-summary data-set)
   (list (minimum data-set) (q1 data-set) (median data-set) (q3 data-set) (maximum data-set)))
 
+(define (iqr data-set)
+  (- (q3 data-set) (q1 data-set)))
+
+(define (low-outliers data-set)
+  (let ((bound (- (q1 data-set) (iqr data-set))))
+    (define (helper data-set)
+      (cond ((null? data-set) '())
+            ((< (car data-set) bound) (cons (car data-set) (helper (cdr data-set))))
+            (else (helper (cdr data-set)))))
+    (helper data-set)))
+(define (high-outliers data-set)
+  (let ((bound (+ (q3 data-set) (iqr data-set))))
+    (define (helper data-set)
+      (cond ((null? data-set) '())
+            ((> (car data-set) bound) (cons (car data-set) (helper (cdr data-set))))
+            (else (helper (cdr data-set)))))
+    (helper data-set)))
+
+(define (display-list l)
+  (cond ((null? l) '())
+        ((= (length l) 1) (display (car l)))
+        (else (display (car l)) (display ", ") (display-list (cdr l)))))
+
+;Displays everything about the data-set with one function 
 (define (analyze-data data-set)
-  (display "5 number summary: {") (display (car (5-num-summary data-set))) (display ", ")
-  (display (cadr (5-num-summary data-set))) (display ", ")
-  (display (caddr (5-num-summary data-set))) (display ", ")
-  (display         (cadddr (5-num-summary data-set)))(display ", ")
-  (display   (car (cddddr (5-num-summary data-set)))) (display "}")
+  (display "5 number summary: {") (display-list (5-num-summary data-set)) (display "}")
+  (newline)
+  (display "IQR: ") (display (iqr data-set))
+  (newline)
+  (display "Low outliers: ") (display-list (low-outliers data-set))
+  (newline)
+  (display "High outliers: ") (display-list (high-outliers data-set))
   (newline)
   (display "Mean: ") (display (mean data-set))
   (newline)
   (display "Standard deviation: ") (display (standard-dev data-set)))
+
+;test data sets
+;collection of weights of backpacks in our math class
+(define backpack-data '(23 20 20 20 20 20 19.5 19 17 17 17 16 16 16 15.5 14 14 14 14 13 12.5 12 12 12 11.5 11.5 11 10.5 10))
