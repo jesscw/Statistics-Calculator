@@ -13,6 +13,12 @@
 (define (standard-dev data-set)
   (sqrt (variance data-set)))
 
+(define (variance-sample data-set)
+  (/ (sum (map (lambda (x) (expt (- x (mean data-set)) 2)) data-set)) (- (length data-set) 1)))
+
+(define (sd-sample data-set)
+  (sqrt (variance-sample data-set)))
+
 (define (item index l)
   (cond ((= index 0) (car l))
         (else (item (- index 1) (cdr l)))))
@@ -84,8 +90,12 @@
         ((= (length l) 1) (display (car l)))
         (else (display (car l)) (display ", ") (display-list (cdr l)))))
 
+(define (range data-set)
+  (- (maximum data-set) (minimum data-set)))
 ;Displays everything about the data-set with one function 
 (define (analyze-data data-set)
+  (display "Range: ") (display (range data-set))
+  (newline)
   (display "5 number summary: {") (display-list (5-num-summary data-set)) (display "}")
   (newline)
   (display "IQR: ") (display (iqr data-set))
@@ -96,8 +106,11 @@
   (newline)
   (display "Mean: ") (display (mean data-set))
   (newline)
-  (display "Standard deviation: ") (display (standard-dev data-set)))
+  (display "Standard deviation: ") (display (standard-dev data-set))
+  (newline)
+  (display "Sample standard deviation: ") (display (sd-sample data-set)))
 
 ;test data sets
 ;collection of weights of backpacks in our math class
 (define backpack-data '(23 20 20 20 20 20 19.5 19 17 17 17 16 16 16 15.5 14 14 14 14 13 12.5 12 12 12 11.5 11.5 11 10.5 10))
+(define treadmill-data '(23 10 10 28 18 23 24 16 13 29 27 26 19 26 7 22 25 12 30 23 15 16 22 27))
